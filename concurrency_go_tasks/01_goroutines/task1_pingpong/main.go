@@ -14,7 +14,6 @@ func PingPong(w io.Writer) {
 	// TODO: реализовать обмен сообщениями между горутинами
 	pingChan := make(chan struct{})
 	pongChan := make(chan struct{})
-	doneChan := make(chan struct{})
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -25,7 +24,7 @@ func PingPong(w io.Writer) {
 		for i := 0; i < 5; i++ {
 			<-pingChan
 
-			fmt.Println("ping")
+			fmt.Fprintln(w, "ping")
 
 			pongChan <- struct{}{}
 		}
@@ -33,23 +32,20 @@ func PingPong(w io.Writer) {
 
 	go func() {
 		defer wg.Done()
-
+		pingChan <- struct{}{}
 		for i := 0; i < 5; i++ {
 			<-pongChan
-			fmt.Println("pong")
+			fmt.Fprintln(w, "pong")
 
 			if i < 4 {
 				pingChan <- struct{}{}
 			}
 
-			close(doneChan)
-
 		}
 	}()
-	pingChan <- struct{}{}
-
-	<-doneChan
 	wg.Wait()
+	close(pingChan)
+	close(pongChan)
 }
 
 func main() {
