@@ -20,7 +20,7 @@ func Run(w io.Writer) {
 		defer wg.Done()
 		defer close(ch)
 
-		for i := 0; i < 10; i++ {
+		for i := 1; i < 11; i++ {
 			ch <- i
 		}
 	}()
@@ -28,7 +28,7 @@ func Run(w io.Writer) {
 	go func() {
 		defer wg.Done()
 		for num := range ch {
-			fmt.Fprintf(w, "%d ", num)
+			_, _ = fmt.Fprintf(w, "%d\n", num)
 		}
 
 	}()
