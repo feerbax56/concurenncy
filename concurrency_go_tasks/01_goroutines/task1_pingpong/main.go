@@ -11,7 +11,6 @@ import (
 // которые поочередно выводят строки пять раз каждая.
 // Реализуйте синхронизацию через каналы и ожидание завершения.
 func PingPong(w io.Writer) {
-	// TODO: реализовать обмен сообщениями между горутинами
 	pingChan := make(chan struct{})
 	pongChan := make(chan struct{})
 
@@ -32,7 +31,6 @@ func PingPong(w io.Writer) {
 
 	go func() {
 		defer wg.Done()
-		pingChan <- struct{}{}
 		for i := 0; i < 5; i++ {
 			<-pongChan
 			fmt.Fprintln(w, "pong")
@@ -43,6 +41,8 @@ func PingPong(w io.Writer) {
 
 		}
 	}()
+
+	pingChan <- struct{}{}
 	wg.Wait()
 	close(pingChan)
 	close(pongChan)
